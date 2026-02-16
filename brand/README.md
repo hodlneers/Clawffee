@@ -1,4 +1,8 @@
 # Clawffee Brand Assets
+<p>
+  <img src="./logo/clawffee-mark.light.svg#gh-light-mode-only" alt="Clawffee logo (light mode)" width="128" />
+  <img src="./logo/clawffee-mark.dark.svg#gh-dark-mode-only" alt="Clawffee logo (dark mode)" width="128" />
+</p>
 
 This folder contains official Clawffee identity assets and governance files.
 
