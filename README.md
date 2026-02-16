@@ -115,6 +115,8 @@ Sometimes the best thing before action is a quick look, a pause, or a reset — 
 - Pause moments remain optional, lightweight, and non-enforced
 
 See:
+- `docs/Clawffee_PDR.md`
+- `docs/Clawffee_MVP_Spec.md`
 - `docs/specs/REQUIREMENTS_SECURITY_INSPECTOR_V1.md`
 - `docs/specs/REQUIREMENTS_TOKEN_OPTIMIZER_V1_1.md`
 - `docs/context/THREAD_CONTEXT_AND_DECISIONS_2026-02-16.md`

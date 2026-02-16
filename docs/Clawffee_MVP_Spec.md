@@ -1,93 +1,175 @@
-# Clawffee MVP Specification
+# Clawffee MVP Specification (v1.0)
 
-## 1. Objective
+## 1. Goal
 
-The Minimum Viable Product (MVP) for Clawffee aims to deliver a proof-of-concept robotic barista capable of preparing a basic espresso beverage autonomously while demonstrating the core principles of safety, modularity, and extensibility set out in the Preliminary Design Report. The MVP should be sufficiently functional to showcase the feasibility of the system, collect user feedback, and lay the groundwork for subsequent iterations.
+Ship a local-first security inspector that scans source trees for evidence-backed risk indicators and produces machine-readable plus human-readable reports.
 
-## 2. Scope of the MVP
+## 2. In-Scope (v1.0)
 
-The MVP will implement only the essential features required to brew a single espresso and serve it to the user. Optional or secondary features (milk steaming, multiple drink types, advanced UI) are deferred to later releases.
+### 2.1 Scanner Core
 
-### 2.1 Functional Requirements
+Implemented in `src/clawffee/security_inspector.py`:
+- inspect a file or directory target
+- apply rule patterns line-by-line
+- emit indicators with evidence
+- derive capability flags and overall severity profile
 
-- Drink Request Submission: Provide a simple interface (command line or minimal web UI) for users to request an espresso.
-- Hardware Initialization: Warm up the espresso machine, check water level, and calibrate sensors.
-- Recipe Execution: Execute the espresso recipe via an automated sequence of skills:
-  - Grind and dose beans
-  - Tamp the puck
-  - Attach portafilter
-  - Brew shot using preset parameters
-  - Detach portafilter and perform a quick clean
-- Status Reporting: Show real-time status updates during preparation (heating, grinding, brewing, complete) and final result. Provide error messages if a fault is detected.
-- Safety Confirmation: Require user confirmation before commencing brew if any sensor reading is abnormal (for example machine overheating or door open).
-- Logging: Record brew parameters (grind size, time, yield) and any deviations for later analysis.
+### 2.2 Supported File Types
 
-### 2.2 Non-Functional Requirements
+v1 scanner processes files with these suffixes:
+- `.py`
+- `.js`
+- `.ts`
+- `.sh`
+- `.json`
+- `.yml`
+- `.yaml`
+- `.md`
 
-- Safety and Compliance: Conform to the security inspector guidelines described in the PDR. Avoid actions that might cause harm and always fall back to a safe state on error.
-- Reliability: Operate for at least 10 consecutive brew cycles without unhandled exceptions.
-- Ease of Setup: Developer docs should enable a new contributor to set up and run the MVP using simulated hardware in under 30 minutes.
-- Extensibility: Interfaces should support adding new drinks or hardware without significant refactoring.
-- Documentation: Provide clear README and API docs; include recipe extension and calibration guidance.
+### 2.3 Supported Pattern Families
 
-## 3. System Components for MVP
+Current pattern IDs and intent:
+- `shell.exec` - command execution capability (HIGH)
+- `network.http` - outbound network behavior (MEDIUM)
+- `filesystem.write` - local file mutation patterns (MEDIUM)
+- `secrets.env` - environment-variable access (HIGH)
+- `dynamic.eval` - dynamic code execution patterns (HIGH)
 
-- Hardware Simulation: Initially run against simulated modules (dummy implementations of ArmController, Grinder, BrewUnit). Real hardware adapters should conform to the same interfaces.
-- Core Skills:
-  - `grind_beans`
-  - `dose_portafilter`
-  - `tamp_puck`
-  - `attach_portafilter`
-  - `start_brew`
-  - `detach_portafilter`
-  - `quick_clean`
-- Simple Planner: An `espresso` planner that sequences core skills with fixed parameters.
-- Agent: OpenClaw agent with memory, planning, and security inspector enabled; initially load only espresso planner and core skills.
-- User Interface:
-  - CLI flow: user executes a brew command, or
-  - Minimal endpoint: `POST /make-espresso` with JSON status updates.
-- Logging Facility: Write action and sensor logs to `logs/brew_log.json` with timestamped events.
+### 2.4 Report Outputs
 
-## 4. Implementation Approach
+- JSON renderer: `src/clawffee/reporting.py::to_json`
+- Markdown renderer: `src/clawffee/reporting.py::to_markdown`
 
-- Repository Structure: Follow `docs/Clawffee_Repo_Structure_and_Interfaces.md`.
-- Dependencies: Python 3.10+; FastAPI or Flask for optional web interface; simulation-first hardware abstraction.
-- Testing: Use `pytest` for unit tests and integration tests, including abnormal conditions.
-- CI: Use GitHub Actions for test and static checks (`flake8`, `mypy`).
-- Documentation: README setup path, simulation runbook, and documented skills/planners.
+Both include:
+- target path
+- summary
+- capability profile
+- indicator list with evidence
+- disclaimer (informational-only)
 
-## 5. MVP Deliverables
+## 3. Interfaces
 
-- Executable Code: installable/runable Python package with skills, planner, and agent wiring.
-- Simulation Environment: scripts/instructions to run against simulated hardware.
-- Documentation:
-  - `README.md`
-  - `docs/Clawffee_MVP_Spec.md`
-  - API docs for REST mode (if enabled)
-- Test Suite: unit + integration tests with run instructions.
-- Logging Data: sample brew logs demonstrating expected behavior.
+### 3.1 CLI Interface
 
-## 6. Timeline
+Entrypoint: `src/clawffee/cli.py`
 
-| Milestone | Description | Timeframe |
-| --- | --- | --- |
-| Requirements Finalization | Confirm functional and non-functional requirements | Week 1 |
-| Hardware Abstraction | Implement simulated hardware modules | Week 2 |
-| Skill Implementation | Build and test core skills | Weeks 3-4 |
-| Planner and Agent Setup | Compose skills into planner and integrate OpenClaw agent | Week 5 |
-| UI/API Development | Implement CLI or minimal web interface | Week 6 |
-| Testing and Debugging | Integration tests and defect fixes | Week 7 |
-| Documentation | README, MVP spec, developer notes | Week 7 |
-| MVP Release | Tag MVP and collect feedback | Week 8 |
+Command:
 
-## 7. Out of Scope for MVP
+```bash
+clawffee <target> [--format json|md]
+```
 
-- Multi-drink recipes (for example cappuccino, latte) and milk steaming support.
-- Adaptive brewing based on dynamic sensor feedback.
-- Advanced web UI with drink customization and user accounts.
-- Remote monitoring and cloud analytics.
-- Automatic maintenance routines (descaling, deep cleaning).
+Defaults:
+- output format: `json`
 
-## 8. Conclusion
+### 3.2 OpenClaw Plugin Interface
 
-This MVP establishes a practical baseline for Clawffee by delivering a working espresso automation flow grounded in safety, modularity, and extensibility. Completion validates the architecture direction, enables stakeholder feedback, and provides the basis for expanded drink workflows.
+Files:
+- `openclaw_plugin.yaml`
+- `plugins/clawffee/security_inspector_operator.py`
+- `src/clawffee/openclaw_adapter.py`
+
+Operator behavior:
+- `transform(payload, config)` reads target from payload field `text` by default (`target_field` config key)
+- executes local scan
+- returns normalized dict for framework transport
+
+Capability envelope returned by adapter:
+- stage: `analysis`
+- operation: `skill-vetting`
+- result_type: `security-inspection-report`
+
+## 4. Data Contracts
+
+### 4.1 Internal Models
+
+`src/clawffee/models.py` provides:
+- `Severity`
+- `Evidence`
+- `Indicator`
+- `CapabilityProfile`
+- `ScanSummary`
+- `ScanReport`
+
+### 4.2 JSON Shape (Top-Level)
+
+```json
+{
+  "target": "...",
+  "summary": {
+    "files_scanned": 0,
+    "indicators_found": 0,
+    "overall_profile": "INFO|LOW|MEDIUM|HIGH"
+  },
+  "capabilities": {
+    "shell_execution": false,
+    "network_access": false,
+    "filesystem_write": false,
+    "env_access": false,
+    "dynamic_code": false
+  },
+  "indicators": [
+    {
+      "id": "...",
+      "severity": "...",
+      "title": "...",
+      "detail": "...",
+      "confidence": "MEDIUM",
+      "evidence": {
+        "file": "...",
+        "line": 1,
+        "excerpt": "..."
+      }
+    }
+  ],
+  "disclaimer": "..."
+}
+```
+
+## 5. Default Configuration
+
+### 5.1 CLI defaults
+- format: `json`
+
+### 5.2 OpenClaw operator defaults
+- `target_field`: `text`
+
+### 5.3 Scanner defaults
+- suffix allowlist from `_DEFAULT_SUFFIXES`
+- active rules from `_PATTERN_DEFS`
+
+## 6. Non-Goals (v1.0)
+
+- AST/dataflow semantic analysis
+- enforcement/sandbox mode
+- guarantee/certification scoring
+- dependency manifest analysis (planned)
+- scan diff mode (planned)
+
+## 7. Quality Gates
+
+- Unit tests in `tests/`
+- CI workflow in `.github/workflows/ci.yml` executes tests on push/PR
+
+## 8. Planned Enhancements
+
+Per `docs/project/IMPLEMENTATION_BACKLOG.md`:
+
+1. Detection quality
+- configurable rule packs and severities
+- duplicate-indicator collapsing
+- dependency manifest inspection (`package.json`, `requirements.txt`)
+- diff mode between scans
+
+2. OpenClaw integration hardening
+- compatibility tests against OpenClaw fixture skills
+
+3. v1.1 roadmap
+- token-optimizer features (separate phase)
+
+## 9. Acceptance Criteria (v1.0)
+
+- scanner runs locally via CLI
+- OpenClaw operator wrapper can invoke scanner and return structured result
+- reports render in both JSON and markdown
+- CI executes unit tests on push/PR

@@ -11,6 +11,10 @@
 - `docs/Clawffee_Repo_Structure_and_Interfaces.md`
 - `docs/project/IMPLEMENTATION_BACKLOG.md`
 
+## Current v1 Design
+- `docs/Clawffee_PDR.md` (security inspector architecture, risks, assumptions)
+- `docs/Clawffee_MVP_Spec.md` (v1 scope, interfaces, report contracts)
+
 ## Architecture Decisions
 - `docs/decisions/ADR-001-Brand-And-Positioning.md`
 - `docs/decisions/ADR-002-Product-Sequence.md`

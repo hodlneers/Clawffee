@@ -2,57 +2,165 @@
 
 ## 1. Purpose
 
-This PDR defines the initial architecture and delivery plan for Clawffee's MVP robotic barista flow, with OpenClaw-aligned modular skills and planner orchestration.
+This PDR documents the v1 architecture for Clawffee's local-first security inspector and skill-vetting workflow. It reflects the current implementation under `src/clawffee` and the OpenClaw-facing adapter under `plugins/clawffee`.
 
-## 2. Architecture Overview
+Primary objective:
+- provide fast, evidence-backed risk visibility for skill/source trees before runtime enablement.
 
-System layers:
-1. Interface Layer: CLI or minimal HTTP endpoint for brew request intake.
-2. Agent/Planner Layer: OpenClaw planner that sequences espresso workflow steps.
-3. Skill Layer: isolated skills for grind, dose, tamp, attach, brew, detach, clean.
-4. Hardware Abstraction Layer: simulated adapters first, real device adapters later.
-5. Safety and Logging Layer: guard checks, confirmation gate, and structured logs.
+Non-objective:
+- certify code as safe or guarantee security outcomes.
 
-## 3. Core Modules
+## 2. System Architecture
 
-- `clawffee/interface/`: request intake and status reporting.
-- `clawffee/planners/espresso_planner.py`: fixed-sequence planner.
-- `clawffee/skills/`: skill implementations.
-- `clawffee/hardware/`: simulation and device adapters.
-- `clawffee/safety/`: thresholds and abnormal-state checks.
-- `clawffee/logging/`: JSON event logging.
+Clawffee v1 is organized into five layers:
 
-## 4. Safety Considerations
+1. Detection layer
+- `src/clawffee/security_inspector.py`
+- walks files, applies regex-based rules, generates indicators and capability flags.
 
-- Preflight checks before skill execution.
-- Human confirmation gate when safety thresholds are crossed.
-- Immediate fail-safe transition on critical errors.
-- No silent retries on potentially unsafe actions.
+2. Data model layer
+- `src/clawffee/models.py`
+- defines `Severity`, `Evidence`, `Indicator`, `CapabilityProfile`, `ScanSummary`, and `ScanReport`.
 
-## 5. Testing Strategy
+3. Integration/translation layer
+- `src/clawffee/openclaw_adapter.py`
+- serializes reports to framework-safe dicts and provides OpenClaw capability envelope metadata.
 
-- Unit tests per skill.
-- Planner tests for sequence correctness.
-- Integration tests for end-to-end simulated brew.
-- Fault-injection tests for abnormal sensor scenarios.
+4. Reporting/output layer
+- `src/clawffee/reporting.py`
+- renders reports as JSON or markdown.
 
-## 6. Delivery Plan
+5. Interface layer
+- CLI: `src/clawffee/cli.py`
+- OpenClaw operator wrapper: `plugins/clawffee/security_inspector_operator.py`
 
-- Week 1: finalize requirements and constraints.
-- Week 2: hardware simulation adapters.
-- Weeks 3-4: core skills + tests.
-- Week 5: planner and OpenClaw integration.
-- Week 6: interface implementation.
-- Week 7: hardening, integration tests, docs.
-- Week 8: MVP tag and feedback collection.
+## 3. Detection Design
 
-## 7. Risks and Mitigation
+### 3.1 Scan Workflow
 
-- Hardware interface drift: enforce stable adapter interfaces.
-- Unsafe state transitions: centralize safety checks.
-- Integration complexity: simulation-first with deterministic tests.
-- Scope creep: keep single-drink MVP boundaries.
+`SecurityInspector.inspect(target)` performs:
 
-## 8. Exit Criteria
+1. Validate target path exists.
+2. Enumerate files by suffix.
+3. Read each file as UTF-8 with latin-1 fallback.
+4. Evaluate each line against pattern definitions.
+5. Emit one `Indicator` per pattern match, with evidence:
+- relative file path
+- line number
+- excerpt
+6. Set capability booleans based on matched indicator IDs.
+7. Compute overall profile using highest observed severity.
+8. Return `ScanReport` with disclaimer.
 
-The PDR phase is complete when architecture, safety model, and delivery milestones are agreed and traceable to requirements and MVP spec docs.
+### 3.2 Current Rule Set
+
+Current indicator IDs in `_PATTERN_DEFS`:
+- `shell.exec` (HIGH)
+- `network.http` (MEDIUM)
+- `filesystem.write` (MEDIUM)
+- `secrets.env` (HIGH)
+- `dynamic.eval` (HIGH)
+
+Each rule contains:
+- indicator ID
+- severity
+- title/detail text
+- compiled regex
+- capability attribute mapping
+
+### 3.3 File Coverage
+
+Current suffix allowlist (`_DEFAULT_SUFFIXES`):
+- `.py`, `.js`, `.ts`, `.sh`, `.json`, `.yml`, `.yaml`, `.md`
+
+## 4. OpenClaw Integration
+
+### 4.1 Plugin Metadata
+
+`openclaw_plugin.yaml` declares:
+- plugin identity/version
+- operator class: `plugins.clawffee.security_inspector_operator.SecurityInspectorOperator`
+- capability envelope:
+  - stage: `analysis`
+  - operation: `skill-vetting`
+
+### 4.2 Operator Contract
+
+`SecurityInspectorOperator` provides conventional framework methods:
+- `name()`
+- `version()`
+- `profile()`
+- `capabilities()`
+- `default_config()`
+- `transform(payload, config)`
+
+`transform` behavior:
+- reads target path from payload field configured by `target_field` (default `text`)
+- runs `SecurityInspector.inspect`
+- returns normalized dict via `to_openclaw_result`
+
+## 5. Reporting Model
+
+### 5.1 JSON
+
+`to_json(report)` emits:
+- target
+- summary (`files_scanned`, `indicators_found`, `overall_profile`)
+- capabilities
+- indicators (with evidence)
+- disclaimer
+
+### 5.2 Markdown
+
+`to_markdown(report)` emits:
+- summary header
+- capabilities section
+- indicator list
+- disclaimer
+
+## 6. Assumptions
+
+- Source is available locally at scan time.
+- Regex-based heuristics are acceptable for v1 speed/simplicity.
+- False positives/false negatives are expected and manageable with evidence-first output.
+- OpenClaw integration uses adapter dictionaries rather than direct framework internals.
+
+## 7. Risks and Mitigations
+
+1. Rule accuracy risk
+- Risk: noisy or missed detections.
+- Mitigation: evidence included per finding; roadmap includes configurable rule packs and deduping.
+
+2. Scope drift risk
+- Risk: docs promise deeper analysis than code implements.
+- Mitigation: this PDR is implementation-grounded; MVP spec explicitly marks planned enhancements.
+
+3. Integration mismatch risk
+- Risk: OpenClaw runtime contract differences.
+- Mitigation: keep operator wrapper thin and isolated; add compatibility fixture tests (backlog milestone).
+
+4. Performance risk
+- Risk: large trees increase scan time.
+- Mitigation: suffix filtering and line-based scanning; future optimization via rule partitioning and cached scans.
+
+## 8. Limitations (v1)
+
+- Static regex matching only (no AST/dataflow analysis).
+- No diff mode yet.
+- No dependency manifest risk scoring yet.
+- No runtime sandbox enforcement.
+- No in-tool policy engine.
+
+## 9. Validation Strategy
+
+- Unit tests cover scanner, rendering, adapter serialization, and operator path.
+- CI workflow (`.github/workflows/ci.yml`) runs tests on push and pull request.
+
+## 10. Forward Path
+
+Planned work from `docs/project/IMPLEMENTATION_BACKLOG.md`:
+- detection-quality improvements (rule packs, dedupe)
+- diff mode
+- dependency manifest scanning
+- deeper OpenClaw compatibility testing
+- token optimizer phase (v1.1)
