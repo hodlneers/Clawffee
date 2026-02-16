@@ -1,0 +1,23 @@
+<svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Clawffee favicon mark">
+  <path d="
+    M128 20
+    C172 20 196 62 196 128
+    C196 194 172 236 128 236
+    C84 236 60 194 60 128
+    C60 62 84 20 128 20
+    Z
+  " fill="#2C1F16"/>
+
+  <path d="
+    M128 42
+    L120 84
+    L136 124
+    L120 166
+    L128 214
+  "
+  fill="none"
+  stroke="#C62828"
+  stroke-width="14"
+  stroke-linecap="square"
+  stroke-linejoin="miter"/>
+</svg>

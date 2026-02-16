@@ -1,0 +1,43 @@
+{
+  "brand": {
+    "name": "Clawffee",
+    "version": "1.0"
+  },
+  "colors": {
+    "bean_primary": {
+      "name": "Bean Brown",
+      "hex": "#2C1F16",
+      "rgb": "44, 31, 22",
+      "usage": "Primary logo fill (light mode)"
+    },
+    "bean_dark_mode": {
+      "name": "Bean Dark",
+      "hex": "#1B1410",
+      "rgb": "27, 20, 16",
+      "usage": "Primary logo fill (dark mode)"
+    },
+    "seam_red": {
+      "name": "OpenClaw Red (Locked)",
+      "hex": "#C62828",
+      "rgb": "198, 40, 40",
+      "usage": "Inspection seam. Do not modify."
+    },
+    "mono_black": {
+      "name": "Black",
+      "hex": "#000000",
+      "rgb": "0, 0, 0",
+      "usage": "Monochrome version"
+    },
+    "mono_white": {
+      "name": "White",
+      "hex": "#FFFFFF",
+      "rgb": "255, 255, 255",
+      "usage": "Monochrome inverse version"
+    }
+  },
+  "rules": {
+    "red_drift_tolerance": "0%",
+    "digital_exact_match_required": true,
+    "do_not_substitute_red": true
+  }
+}
