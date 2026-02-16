@@ -33,3 +33,11 @@ Use:
 
 ## Follow-Up Needed
 When implementation starts, validate exact OpenClaw skill metadata shape against the latest upstream source and update this file if field names or loading precedence differ.
+
+## Plugin Packaging Reference
+The extracted historical strategy file (`docs/context/OPENCLAW_SKILL_STRATEGY_EXTRACTED.md`) captures OpenClaw plugin packaging assumptions that may still be useful when shipping Clawffee as an installable skill/plugin:
+- `openclaw_plugin.yaml` metadata contract
+- discoverable `plugins/<name>/` operator modules
+- expected operator method surface
+- default config merge pattern
+- test expectations for deterministic outputs
