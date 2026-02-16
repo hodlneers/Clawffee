@@ -1,4 +1,8 @@
-# Clawffee ☕🦀  
+# Clawffee
+<p>
+  <img src="./brand/logo/clawffee-mark.light.svg#gh-light-mode-only" alt="Clawffee logo (light mode)" width="128" />
+  <img src="./brand/logo/clawffee-mark.dark.svg#gh-dark-mode-only" alt="Clawffee logo (dark mode)" width="128" />
+</p>
 **Coffee for AI**
 
 Clawffee is a **local-first toolkit for AI operators**.
@@ -159,5 +163,3 @@ Use it where it helps.
 Skip it where it doesn’t.
 
 ---
-
-☕  
