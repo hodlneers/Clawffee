@@ -4,6 +4,12 @@
 - `docs/context/THREAD_CONTEXT_AND_DECISIONS_2026-02-16.md`
 - `docs/context/OPENCLAW_SKILL_STRATEGY_EXTRACTED.md`
 
+## Imported Deliverables
+- `docs/Clawffee_PDR.md`
+- `docs/Clawffee_MVP_Spec.md`
+- `docs/Clawffee_Requirements.md`
+- `docs/Clawffee_Repo_Structure_and_Interfaces.md`
+
 ## Architecture Decisions
 - `docs/decisions/ADR-001-Brand-And-Positioning.md`
 - `docs/decisions/ADR-002-Product-Sequence.md`
