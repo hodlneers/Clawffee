@@ -152,6 +152,15 @@ Key paths:
 
 ---
 
+## OpenClaw Upstream Reference
+
+- We do not vendor OpenClaw.
+- We track upstream explicitly for methodology/compatibility.
+- See `OPENCLAW_UPSTREAM.md`.
+- Fetch script: `./scripts/fetch-openclaw.sh`
+
+---
+
 ## License & Use
 
 Clawffee is designed to be:

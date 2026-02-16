@@ -4,3 +4,8 @@
 .venv_pdf/
 __pycache__/
 .pytest_cache/
+external/openclaw/
+*.zip
+openclaw-main.zip
+openclaw-main/
+OpenClaw/
