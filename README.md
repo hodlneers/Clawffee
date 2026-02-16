@@ -122,6 +122,30 @@ See:
 
 ---
 
+## Development
+
+Python package layout is now bootstrapped under `src/clawffee`.
+
+Quick start:
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e .[dev]
+clawffee . --format md
+pytest
+```
+
+Key paths:
+- `src/clawffee/security_inspector.py`
+- `src/clawffee/models.py`
+- `src/clawffee/openclaw_adapter.py`
+- `src/clawffee/reporting.py`
+- `tests/`
+- `.github/workflows/ci.yml`
+- `docs/project/IMPLEMENTATION_BACKLOG.md`
+
+---
+
 ## License & Use
 
 Clawffee is designed to be:

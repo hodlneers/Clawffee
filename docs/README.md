@@ -9,6 +9,7 @@
 - `docs/Clawffee_MVP_Spec.md`
 - `docs/Clawffee_Requirements.md`
 - `docs/Clawffee_Repo_Structure_and_Interfaces.md`
+- `docs/project/IMPLEMENTATION_BACKLOG.md`
 
 ## Architecture Decisions
 - `docs/decisions/ADR-001-Brand-And-Positioning.md`

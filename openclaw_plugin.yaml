@@ -1,0 +1,14 @@
+id: clawffee
+description: Local-first security inspection and skill vetting for OpenClaw skill ecosystems.
+authors:
+  - name: Clawffee Contributors
+version: 0.1.0
+operators:
+  - module: plugins.clawffee.security_inspector_operator
+    class: SecurityInspectorOperator
+capabilities:
+  stage:
+    - analysis
+  operation: skill-vetting
+supported_request_types:
+  - text/plain

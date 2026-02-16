@@ -1,1 +1,6 @@
 .claude/
+.DS_Store
+.venv/
+.venv_pdf/
+__pycache__/
+.pytest_cache/
