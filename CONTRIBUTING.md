@@ -57,6 +57,9 @@ Branch protection settings should enforce:
 - approval requirement before merge
 - disallow direct pushes
 
+Maintainers should use:
+- `docs/process/MAINTAINER_MERGE_CHECKLIST.md`
+
 
 
 ## Branch Naming Examples
