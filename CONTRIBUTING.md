@@ -1,72 +1,56 @@
-# Contributing to Clawffee ☕🦀
+# Contributing to Clawffee
 
-Thanks for your interest in contributing to **Clawffee for Agents**.
+Thanks for contributing.
 
-Clawffee is a practical, local-first toolkit designed to make AI agent workflows:
-- safer
-- clearer
-- more efficient
+Clawffee is a local-first security inspection tool. Changes should prioritize clarity, reliability, and compatibility with the documented architecture.
 
-This guide explains how to contribute without overcomplicating things.
+## Branch Strategy
 
----
+- `main`: stable branch. No direct pushes.
+- `develop`: integration branch. No direct pushes.
+- `feature/*` and `bugfix/*`: short-lived branches created from `develop`.
 
-## Project Values (Plain, Not Philosophical)
+## Required Workflow
 
-We try to keep Clawffee:
-- **useful first**
-- **calm by default**
-- **non-authoritative**
-- **easy to remove**
-- **boring in a good way**
+1. Create your branch from `develop`.
+2. Keep commits focused and logically grouped.
+3. Rebase your branch on latest `develop` before opening/updating PR.
+4. Open PR targeting `develop`.
+5. After review and CI pass, merge using repository merge policy.
 
-If a contribution adds clarity, reduces risk, or saves resources, it probably fits.
+## Merge Policy
 
-If it introduces enforcement, scoring, or moral framing, it probably doesn’t.
+- Default: **Rebase and merge** to keep history linear and preserve meaningful commits.
+- Selective: **Squash and merge** when a branch contains WIP/fixup micro-commits that do not stand alone.
+- Avoid: merge commits for routine PRs.
 
----
+## Commit Message Guidance
 
-## What We’re Happy to Accept
+Use concise commit messages that describe intent clearly.
 
-### ✅ Code Contributions
-- new detectors for skill inspection
-- improved static analysis accuracy
-- performance improvements
-- better diffing and reporting
-- clearer CLI output
-- bug fixes and tests
+Examples:
+- `feat: add dependency manifest detector scaffold`
+- `fix: correct severity aggregation for empty indicator sets`
+- `docs: clarify OpenClaw upstream validation policy`
 
-### ✅ Documentation
-- clearer explanations
-- usage examples
-- edge cases
-- security disclaimers written in plain language
+## Quality Expectations
 
-### ✅ Issues & Discussions
-- false positives or false negatives
-- unclear output
-- confusing UX
-- real-world OpenClaw use cases
+- Add or update tests for behavior changes.
+- Keep docs in sync with implementation.
+- Do not introduce claims of security guarantees or certifications.
+- Prefer local-first defaults; avoid unnecessary external coupling.
 
----
+## Pull Request Checklist
 
-## What We Avoid (By Design)
+- [ ] Branch is up to date with `develop`
+- [ ] Tests pass locally (or CI status is green)
+- [ ] Docs updated if behavior/contracts changed
+- [ ] No vendored external snapshot artifacts
 
-Please avoid contributions that:
-- enforce behavior or block execution
-- certify skills as “safe” or “unsafe”
-- assign moral or ethical scores
-- add permanent background monitoring
-- require cloud services by default
-- collect or transmit user data
-- anthropomorphize agents
+## Governance Notes
 
-Clawffee informs.  
-It does not judge.
+Branch protection settings should enforce:
+- PR requirement for `main` and `develop`
+- approval requirement before merge
+- disallow direct pushes
 
----
-
-## How to Contribute Code
-
-1. **Fork the repository**
-2. **Create a focused branch**

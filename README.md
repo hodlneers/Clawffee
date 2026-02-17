@@ -160,6 +160,16 @@ Key paths:
 - Fetch script: `./scripts/fetch-openclaw.sh`
 
 ---
+## Contributing
+
+We welcome contributions.
+
+- Follow feature-branch workflow from `develop` (no direct pushes to `main`/`develop`).
+- Open PRs to `develop` and keep branches rebased.
+- See `CONTRIBUTING.md` for full policy and merge strategy.
+
+---
+
 
 ## License & Use
 
