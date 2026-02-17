@@ -8,7 +8,10 @@ Clawffee is a local-first security inspection tool. Changes should prioritize cl
 
 - `main`: stable branch. No direct pushes.
 - `develop`: integration branch. No direct pushes.
-- `feature/*` and `bugfix/*`: short-lived branches created from `develop`.
+- `feature/<issue>-<short-title>`: new feature work from `develop`.
+- `fix/<issue>-<short-title>`: bug fixes from `develop`.
+- `docs/<issue>-<short-title>`: documentation changes from `develop`.
+- `chore/<issue>-<short-title>`: maintenance/tooling updates from `develop`.
 
 ## Required Workflow
 
@@ -54,3 +57,11 @@ Branch protection settings should enforce:
 - approval requirement before merge
 - disallow direct pushes
 
+
+
+## Branch Naming Examples
+
+- `feature/142-add-diff-mode`
+- `fix/207-handle-empty-target`
+- `docs/315-update-upstream-policy`
+- `chore/418-ci-branch-name-check`

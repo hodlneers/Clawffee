@@ -1,0 +1,36 @@
+name: Branch Name Policy
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+jobs:
+  validate-branch-name:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate PR head branch name
+        shell: bash
+        run: |
+          set -euo pipefail
+          BRANCH="${{ github.head_ref }}"
+
+          # Allow trusted automation branches.
+          if [[ "$BRANCH" =~ ^dependabot/ ]] || [[ "$BRANCH" =~ ^renovate/ ]]; then
+            echo "Automation branch allowed: $BRANCH"
+            exit 0
+          fi
+
+          PATTERN='^(feature|fix|docs|chore)/[0-9]+-[a-z0-9][a-z0-9-]*$'
+
+          if [[ "$BRANCH" =~ $PATTERN ]]; then
+            echo "Branch name valid: $BRANCH"
+            exit 0
+          fi
+
+          echo "Invalid branch name: $BRANCH"
+          echo "Expected format:"
+          echo "  feature/<issue>-<short-title>"
+          echo "  fix/<issue>-<short-title>"
+          echo "  docs/<issue>-<short-title>"
+          echo "  chore/<issue>-<short-title>"
+          exit 1
