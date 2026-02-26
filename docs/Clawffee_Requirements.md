@@ -1,56 +1,77 @@
 # Clawffee Requirements Document
 
-This document captures functional and non-functional requirements for the Clawffee MVP described in `docs/Clawffee_MVP_Spec.md`.
+This document captures functional and non-functional requirements for the Clawffee security inspector MVP described in `/Users/hodlneer/Clawffee/docs/Clawffee_MVP_Spec.md`.
 
 ## Functional Requirements
 
-### FR-1: Drink Request Intake
-The system SHALL accept an espresso request through a CLI command or minimal HTTP endpoint.
+### FR-1: Local Target Intake
+The system SHALL accept a local file or directory path as scan input through the CLI and OpenClaw operator interface.
 
-### FR-2: Hardware Readiness
-The system SHALL initialize simulated/real hardware, confirm readiness, and fail safely if readiness checks fail.
+### FR-2: File Enumeration by Allowlist
+The scanner SHALL enumerate only supported suffixes from its configured/default allowlist.
 
-### FR-3: Espresso Workflow Execution
-The system SHALL execute the espresso sequence in order:
-1. Grind beans
-2. Dose portafilter
-3. Tamp puck
-4. Attach portafilter
-5. Start brew
-6. Detach portafilter
-7. Quick clean
+### FR-3: Pattern-Based Indicator Detection
+The scanner SHALL evaluate source lines against the active pattern rules and emit indicators with evidence (`file`, `line`, `excerpt`) for matches.
 
-### FR-4: Safety Confirmation Gate
-The system SHALL require explicit user confirmation before brew start if abnormal sensor conditions are detected.
+### FR-4: Capability Profile Derivation
+The system SHALL derive capability booleans from matched indicator IDs (shell, network, filesystem-write, env access, dynamic code).
 
-### FR-5: Runtime Status and Error Reporting
-The system SHALL expose progress states and actionable error messages during execution.
+### FR-5: Severity Profile Computation
+The system SHALL compute an overall profile based on the highest observed severity in the scan result.
 
-### FR-6: Logging
-The system SHALL persist timestamped logs including key brew parameters and safety-related events.
+### FR-6: Dual Report Rendering
+The system SHALL render scan results as both JSON and Markdown, including summary, capabilities, indicators, and disclaimer text.
+
+### FR-7: CLI Contract
+The CLI SHALL support:
+1. required target argument
+2. `--format` option with `json|md`
+3. default output format of `json`
+
+### FR-8: OpenClaw Operator Contract
+The OpenClaw operator SHALL:
+1. implement the expected operator methods (`name`, `version`, `profile`, `capabilities`, `default_config`, `transform`)
+2. read target from payload field configured by `target_field` (default: `text`)
+3. return adapter-normalized result dictionaries
+
+### FR-9: Local-First Processing
+The scanner SHALL execute locally and SHALL NOT require cloud upload or remote processing for baseline scanning.
+
+### FR-10: Error Handling
+The system SHALL return actionable errors for invalid target paths and unreadable files, while continuing scan work where safe.
+
+### FR-11: Informational Positioning
+Reports SHALL include explicit informational-only language and SHALL NOT label targets as "safe/unsafe certified."
 
 ## Non-Functional Requirements
 
-### NFR-1: Safety Behavior
-On any unrecoverable fault, the system SHALL transition to a safe state and halt execution.
+### NFR-1: Determinism
+Given the same target and rule set, the scanner SHOULD produce stable indicator output.
 
 ### NFR-2: Reliability
-The MVP SHOULD complete at least 10 consecutive simulated brew cycles without unhandled exceptions.
+The scanner SHOULD complete repeated local scans without unhandled exceptions.
 
 ### NFR-3: Setup Time
-A new contributor SHOULD be able to run the simulated MVP in under 30 minutes using project docs.
+A new contributor SHOULD be able to run the local scanner and tests in under 30 minutes using project docs.
 
 ### NFR-4: Extensibility
-Skill/planner interfaces SHOULD allow additional drink recipes and hardware adapters with minimal refactor.
+Rule packs, severities, and output formats SHOULD be extensible with minimal refactor.
 
 ### NFR-5: Testability
-Core skills and planner flow SHALL be covered by unit and integration tests runnable in CI.
+Core scanner, adapter, and renderer behaviors SHALL be covered by tests runnable in CI.
 
 ### NFR-6: Documentation Quality
 README and docs SHALL include setup, execution, troubleshooting, and extension guidance.
 
+### NFR-7: Performance
+Suffix filtering and line-oriented scanning SHOULD keep scans practical for typical skill/source trees.
+
+### NFR-8: Privacy and Data Handling
+The baseline scanner SHOULD avoid transmitting source content externally and SHOULD minimize sensitive data exposure in logs.
+
 ## Acceptance Criteria
-- Espresso flow runs end-to-end in simulation mode.
-- Safety gate triggers on abnormal sensor input.
-- Logs are written with expected fields and timestamps.
-- Test suite passes in CI.
+- CLI scan runs end-to-end for supported target paths.
+- JSON and Markdown reports render with required sections.
+- OpenClaw operator invocation returns structured report dictionaries.
+- Existing CI test suite passes.
+- Requirement language is consistent with `/Users/hodlneer/Clawffee/docs/Clawffee_PDR.md` and `/Users/hodlneer/Clawffee/docs/Clawffee_MVP_Spec.md`.
